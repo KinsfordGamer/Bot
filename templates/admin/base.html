@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Admin{% endblock %} — ATNALTIK</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d0d0d;--sidebar:#111;--card:#1a1a1a;--border:#2a2a2a;
+  --accent:#e63946;--text:#f0f0f0;--text2:#aaa;--text3:#666;
+  --green:#4caf50;--blue:#2196f3;--orange:#ff9800;
+}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:20px;font-size:14px;font-weight:700;color:var(--accent);border-bottom:1px solid var(--border);letter-spacing:.1em}
+.sidebar-logo span{color:var(--text);font-size:11px;display:block;font-weight:400;margin-top:2px}
+.sidebar-nav{padding:12px 0;flex:1}
+.nav-section{padding:8px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--text2);text-decoration:none;font-size:13px;transition:.15s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{background:rgba(230,57,70,.1);color:var(--accent);border-left-color:var(--accent)}
+.nav-item .icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.sidebar-footer a{color:var(--text3);font-size:12px;text-decoration:none}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--sidebar);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar-title{font-size:16px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.content{padding:24px;flex:1}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--text)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center}
+.stat-card .num{font-size:32px;font-weight:700;color:var(--accent)}
+.stat-card .lbl{font-size:12px;color:var(--text2);margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:rgba(255,255,255,.04);padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:.15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#c62828}
+.btn-secondary{background:rgba(255,255,255,.08);color:var(--text)}
+.btn-secondary:hover{background:rgba(255,255,255,.14)}
+.btn-danger{background:rgba(230,57,70,.15);color:var(--accent);border:1px solid rgba(230,57,70,.3)}
+.btn-danger:hover{background:var(--accent);color:#fff}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-success{background:rgba(76,175,80,.15);color:var(--green);border:1px solid rgba(76,175,80,.3)}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.form-input,.form-select,.form-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-size:13px;outline:none;transition:.15s;font-family:inherit}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);background:rgba(255,255,255,.07)}
+.form-textarea{resize:vertical;min-height:100px}
+.form-select option{background:#1a1a1a}
+.badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(76,175,80,.2);color:var(--green)}
+.badge-orange{background:rgba(255,152,0,.2);color:var(--orange)}
+.badge-red{background:rgba(230,57,70,.2);color:var(--accent)}
+.badge-blue{background:rgba(33,150,243,.2);color:var(--blue)}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.page-header h2{font-size:20px;font-weight:700}
+.alert{padding:12px 16px;border-radius:6px;margin-bottom:16px;font-size:13px}
+.alert-error{background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.3);color:#ef9a9a}
+.modal-form{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-form-inner{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+.modal-form-title{font-size:16px;font-weight:700;margin-bottom:20px}
+details summary{cursor:pointer;padding:12px;background:rgba(255,255,255,.04);border-radius:6px;font-size:13px;font-weight:600;margin-bottom:12px;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details[open] summary{border-radius:6px 6px 0 0;background:rgba(230,57,70,.1);color:var(--accent)}
+details .details-inner{background:rgba(255,255,255,.02);border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;padding:16px}
+.season-block{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.season-head{padding:12px 16px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600}
+.ep-row{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.ep-row:last-child{border-bottom:none}
+@media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.sidebar{width:200px}.main{margin-left:200px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    ATNALTIK DUBBING
+    <span>Admin Panel</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Asosiy</div>
+    <a href="/admin" class="nav-item {% if request.path == '/admin' %}active{% endif %}">
+      <span class="icon">📊</span> Dashboard
+    </a>
+    <div class="nav-section">Kontent</div>
+    <a href="/admin/animes" class="nav-item {% if '/admin/animes' in request.path %}active{% endif %}">
+      <span class="icon">🎬</span> Animelar
+    </a>
+    <a href="/admin/genres" class="nav-item {% if '/admin/genres' in request.path %}active{% endif %}">
+      <span class="icon">🏷️</span> Janrlar
+    </a>
+    <div class="nav-section">Foydalanuvchilar</div>
+    <a href="/admin/users" class="nav-item {% if '/admin/users' in request.path %}active{% endif %}">
+      <span class="icon">👥</span> Foydalanuvchilar
+    </a>
+    <div class="nav-section">Sayt</div>
+    <a href="/" class="nav-item" target="_blank">
+      <span class="icon">🌐</span> Saytni ko'rish
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="/admin/logout">🚪 Chiqish</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--text2)">Admin</span>
+    </div>
+  </div>
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+</body>
+</html>

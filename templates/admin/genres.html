@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}Janrlar{% endblock %}
+{% block page_title %}🏷️ Janrlar{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div>
+  <div class="page-header">
+    <h2>Janrlar ro'yxati</h2>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead>
+        <tr><th>Janr</th><th>Anime soni</th><th>Amallar</th></tr>
+      </thead>
+      <tbody>
+        {% for g in genres %}
+        <tr>
+          <td><span>{{ g.icon }}</span> {{ g.name }}</td>
+          <td>{{ g.count }}</td>
+          <td>
+            <form method="POST" action="/admin/genres/{{ g.id }}/delete" onsubmit="return confirm('O\'chirishni tasdiqlaysizmi?')">
+              <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div>
+  <div class="page-header"><h2>Yangi janr qo'shish</h2></div>
+  <div class="card">
+    <form method="POST" action="/admin/genres/add">
+      <div class="form-group">
+        <label class="form-label">Janr nomi</label>
+        <input class="form-input" type="text" name="name" required placeholder="Aksiya">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Icon (emoji)</label>
+        <input class="form-input" type="text" name="icon" value="🎭">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rang (CSS rgba)</label>
+        <input class="form-input" type="text" name="color" value="rgba(100,100,100,0.15)">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Qo'shish</button>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}

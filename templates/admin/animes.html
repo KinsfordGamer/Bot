@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% block title %}Animelar{% endblock %}
+{% block page_title %}🎬 Animelar{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Barcha animelar ({{ animes|length }})</h2>
+  <a href="/admin/animes/add" class="btn btn-primary">+ Yangi anime</a>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden">
+  <table>
+    <thead>
+      <tr>
+        <th>Anime</th><th>Yil</th><th>Holat</th><th>Reyting</th><th>Fasllar</th><th>Janrlar</th><th>Amallar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for anime in animes %}
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.5rem">{{ anime.icon }}</span>
+            <div>
+              <div style="font-weight:600;font-size:13px">{{ anime.title }}</div>
+              <div style="font-size:11px;color:var(--text3)">{{ anime.original_title }}</div>
+            </div>
+          </div>
+        </td>
+        <td>{{ anime.year }}</td>
+        <td>
+          {% if anime.status == 'Davom etmoqda' %}
+            <span class="badge badge-green">{{ anime.status }}</span>
+          {% elif anime.status == 'Tugallangan' %}
+            <span class="badge badge-blue">{{ anime.status }}</span>
+          {% else %}
+            <span class="badge badge-orange">{{ anime.status }}</span>
+          {% endif %}
+        </td>
+        <td style="color:#ffd700">⭐ {{ anime.score }}</td>
+        <td>{{ anime.season_count }}</td>
+        <td style="font-size:11px;color:var(--text2)">{{ anime.genres[:2]|join(', ') }}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <a href="/admin/animes/{{ anime.id }}/edit" class="btn btn-secondary btn-sm">✏️</a>
+            <form method="POST" action="/admin/animes/{{ anime.id }}/delete" onsubmit="return confirm('Animeni o\'chirishni tasdiqlaysizmi?')">
+              <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

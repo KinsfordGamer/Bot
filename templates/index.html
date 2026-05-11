@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+    <div class="hero-content">
+      <div class="hero-badge">⬤ JONLI YANGILANISH</div>
+      <h1 class="hero-title">ATNALTIK<br><span class="red">DUBBING</span></h1>
+      <p class="hero-sub">O'zbek tilidagi eng sifatli anime dubbinglari. Har kuni yangi qismlar.</p>
+      <div class="hero-search">
+        <input type="text" placeholder="Anime nomini yozing..." id="heroSearch" oninput="handleSearch(this.value)">
+        <select id="genreFilter" onchange="filterByGenre(this.value)">
+          <option value="">Barcha janrlar</option>
+          {% for g in genres %}
+          <option value="{{ g.name }}">{{ g.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="hero-search-btn" onclick="doSearch()">Qidirish</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-n" id="stat-anime">{{ stats.animes or 0 }}</div><div class="stat-l">Anime</div></div>
+        <div class="stat-div"></div>
+        <div class="stat"><div class="stat-n" id="stat-eps">{{ stats.episodes or 0 }}{% if stats.episodes > 0 %}+{% endif %}</div><div class="stat-l">Qismlar</div></div>
+        <div class="stat-div"></div>
+        <div class="stat"><div class="stat-n">38K+</div><div class="stat-l">Obunachi</div></div>
+        <div class="stat-div"></div>
+        <div class="stat"><div class="stat-n">3+</div><div class="stat-l">Yillik tajriba</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANIME GRID -->
+  <div class="section" id="animes">
+    <div class="sec-head">
+      <div class="sec-title">Barcha Animelar</div>
+    </div>
+    <div class="tabs" id="animeTabs">
+      <button class="tab on" onclick="filterTab(this,'')">Hammasi</button>
+      {% for g in genres %}
+      <button class="tab" onclick="filterTab(this,'{{ g.name }}')">{{ g.name }}</button>
+      {% endfor %}
+    </div>
+    <div class="grid-anime" id="animeGrid">
+      {% for anime in animes %}
+      <div class="card-a" onclick="openAnime({{ anime.id }})">
+        <div class="c-poster">
+          {% if anime.cover_image %}
+            <img src="{{ anime.cover_image }}" alt="{{ anime.title }}">
+          {% else %}
+            {{ anime.icon }}
+          {% endif %}
+          <div class="c-play"><div class="c-play-btn"></div></div>
+          {% if anime.status == 'Davom etmoqda' %}<span class="c-badge new">YANGI</span>{% endif %}
+          <span class="c-badge ep" style="top:auto;bottom:8px;left:8px">{{ anime.season_count }} fasl</span>
+          <span class="c-score">⭐ {{ anime.score }}</span>
+        </div>
+        <div class="c-body">
+          <div class="c-title">{{ anime.title }}</div>
+          <div class="c-meta"><span>{{ anime.year }}</span><span style="color:var(--text3)">•</span><span>{{ anime.genres[0] if anime.genres else '' }}</span></div>
+          <span class="c-genre">{{ anime.genres[:2] | join(' • ') }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- LATEST EPISODES -->
+  <div class="section" id="latest">
+    <div class="sec-head">
+      <div class="sec-title">Oxirgi Qismlar</div>
+    </div>
+    <div class="grid-eps" id="epsGrid"></div>
+  </div>
+
+  <!-- GENRES -->
+  <div class="section" id="genres">
+    <div class="sec-head">
+      <div class="sec-title">Janrlar bo'yicha</div>
+    </div>
+    <div class="grid-genres" id="genresGrid">
+      {% for g in genres %}
+      <div class="card-genre" style="--genre-color:{{ g.color }}" onclick="filterByGenreClick('{{ g.name }}')">
+        <div class="genre-icon">{{ g.icon }}</div>
+        <div class="genre-name">{{ g.name }}</div>
+        <div class="genre-count">{{ g.count }} anime</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- TG BANNER -->
+  <div class="tg-banner">
+    <div class="tg-inner">
+      <div class="tg-icon">✈</div>
+      <div class="tg-text">
+        <h3>ATNALTIK DUBBING — Telegram</h3>
+        <p>Yangi qismlar avvalo Telegram kanalimizda e'lon qilinadi. 38,000+ obunachi bilan qo'shiling!</p>
+      </div>
+      <div class="tg-actions">
+        <button class="btn-tg-main" onclick="window.open('https://t.me/ATNALTIK','_blank')">✈ Kanalga o'tish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANIME DETAIL PAGE (SPA mode) -->
+<div class="page" id="page-detail">
+  <div class="detail-hero">
+    <div class="detail-hero-bg" id="detailBg"></div>
+    <div class="detail-inner">
+      <div class="detail-poster" id="detailPoster"></div>
+      <div class="detail-info">
+        <div class="back-btn" onclick="showPage('home')">← Orqaga</div>
+        <div class="detail-genres" id="detailGenres"></div>
+        <h1 class="detail-title" id="detailTitle"></h1>
+        <div class="detail-original" id="detailOriginal"></div>
+        <div class="detail-score-row">
+          <div class="detail-score" id="detailScore"></div>
+          <div class="detail-status" id="detailStatus"></div>
+        </div>
+        <p class="detail-desc" id="detailDesc"></p>
+        <div class="detail-actions">
+          <button class="btn-watch" id="btnWatch">▶ Tomosha qilish</button>
+          <button class="btn-fav" onclick="window.open('https://t.me/ATNALTIK','_blank')">✈ Telegram</button>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1400px;margin:0 auto;padding:0 2rem">
+      <div class="detail-tabs">
+        <button class="detail-tab on" onclick="detailTab(this,'episodes')">Qismlar</button>
+        <button class="detail-tab" onclick="detailTab(this,'info')">Ma'lumot</button>
+      </div>
+    </div>
+  </div>
+  <div class="section" id="detail-content">
+    <div id="detail-episodes"></div>
+    <div id="detail-info" style="display:none"></div>
+  </div>
+</div>
+
+<!-- SEARCH RESULTS PAGE -->
+<div class="page" id="page-search">
+  <div class="section" style="padding-top:2rem">
+    <div class="back-btn" onclick="showPage('home')">← Orqaga</div>
+    <div class="sec-head">
+      <div class="sec-title" id="searchResultTitle">Qidiruv natijalari</div>
+    </div>
+    <div class="grid-anime" id="searchGrid"></div>
+  </div>
+</div>
+{% endblock %}

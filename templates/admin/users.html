@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}Foydalanuvchilar{% endblock %}
+{% block page_title %}👥 Foydalanuvchilar{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Foydalanuvchilar ({{ users|length }})</h2>
+</div>
+<div class="card" style="padding:0;overflow:hidden">
+  <table>
+    <thead>
+      <tr><th>Ism</th><th>Email / Telegram</th><th>Ro'yxat sanasi</th><th>Holat</th><th>Amallar</th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>
+          {% if u.photo_url %}<img src="{{ u.photo_url }}" style="width:28px;height:28px;border-radius:50%;margin-right:8px;vertical-align:middle">{% endif %}
+          {{ u.first_name }} {{ u.last_name or '' }}
+        </td>
+        <td style="font-size:12px;color:var(--text2)">
+          {% if u.email %}{{ u.email }}{% endif %}
+          {% if u.telegram_id %}<span class="badge badge-blue">✈ @{{ u.username or u.telegram_id }}</span>{% endif %}
+        </td>
+        <td style="font-size:11px;color:var(--text3)">{{ u.created_at[:10] if u.created_at else '' }}</td>
+        <td>
+          {% if u.is_admin %}
+            <span class="badge badge-orange">⚡ Admin</span>
+          {% else %}
+            <span class="badge" style="background:rgba(255,255,255,.05);color:var(--text2)">Oddiy</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="POST" action="/admin/users/{{ u.id }}/toggle-admin">
+            <button type="submit" class="btn btn-sm {{ 'btn-danger' if u.is_admin else 'btn-success' }}">
+              {{ '🚫 Admin olib tashlash' if u.is_admin else '⚡ Admin qilish' }}
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}{{ anime.title }} — ATNALTIK DUBBING{% endblock %}
+
+{% block content %}
+<div class="page active" id="page-detail">
+
+  <!-- HERO SECTION -->
+  <div class="detail-hero">
+    <div class="detail-hero-bg">
+      {% if anime.cover_image %}
+      <img src="{{ anime.cover_image }}" alt="" loading="lazy">
+      {% else %}
+      <span class="icon-placeholder">{{ anime.icon }}</span>
+      {% endif %}
+    </div>
+
+    <div class="detail-inner">
+      <div class="detail-poster">
+        {% if anime.cover_image %}
+        <img src="{{ anime.cover_image }}" alt="{{ anime.title }}" loading="lazy">
+        {% else %}
+        <span class="icon-placeholder big">{{ anime.icon }}</span>
+        {% endif %}
+      </div>
+
+        <div class="detail-info">
+          <div class="back-btn" onclick="window.history.back()">← Orqaga</div>
+  
+          <div class="detail-genres">
+            {% for g in anime.genres %}
+            <span class="detail-genre-tag">{{ g }}</span>
+            {% endfor %}
+          </div>
+  
+          <h1 class="detail-title">{{ anime.title }}</h1>
+          <div class="detail-original">{{ anime.original_title }}</div>
+  
+          <div class="detail-score-row">
+            <div class="detail-score">⭐ {{ anime.score }}/10</div>
+            <div class="detail-status">{{ anime.status }}</div>
+          </div>
+  
+          <p class="detail-desc">{{ anime.description|truncate(280) }}</p>
+  
+          <div class="detail-actions">
+            {% if anime.seasons and anime.seasons[0].episodes %}
+            <button class="btn-watch"
+              onclick="playEpisode({{ anime.seasons[0].episodes[0].id }}, {{ anime.seasons[0].episodes[0].telegram_url|tojson|safe }})">
+              ▶ Tomosha qilish
+            </button>
+            {% endif %}
+            <button class="btn-fav" onclick="window.open('https://t.me/ATNALTIK' ,'_blank')">
+              ✈ Telegram
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Tabs -->
+      <div class="detail-tabs-container">
+        <div class="detail-tabs">
+          <button class="detail-tab on" onclick="detailTab(this, 'episodes')">Qismlar</button>
+          <button class="detail-tab" onclick="detailTab(this, 'info')">Ma'lumot</button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- CONTENT -->
+    <div class="section" id="detail-content">
+  
+      <!-- EPISODES -->
+      <div id="detail-episodes">
+  
+      {% for season in anime.seasons %}
+      <div class="season-block">
+        <div class="season-block-head" onclick="toggleSeason({{ loop.index0 }})">
+          <div class="season-block-title">
+            <span class="season-icon">{{ anime.icon }}</span>
+            {{ season.title }} — {{ season.year }}
+          </div>
+          <div class="season-meta">
+            <span class="season-block-eps">{{ season.episodes|length }} qism</span>
+            <span class="season-block-toggle" id="stoggle-{{ loop.index0 }}">▼</span>
+          </div>
+        </div>
+
+        <div class="eps-list {{ 'open' if loop.first else '' }}" id="slist-{{ loop.index0 }}">
+          {% for e in season.episodes %}
+          <div class="ep-item" onclick="playEpisode({{ e.id }}, {{ e.telegram_url|tojson|safe }})">
+            <div class="ep-item-num">{{ e.num }}</div>
+            <div class="ep-item-info">
+              <div class="ep-item-title">{{ e.title }}</div>
+              <div class="ep-item-dur">{{ e.duration }}</div>
+            </div>
+            {% if e.is_new %}<span class="ep-item-new">YANGI</span>{% endif %}
+            {% if e.telegram_file_id %}<span class="file-icon">📁</span>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- INFO TAB -->
+    <div id="detail-info" class="info-grid" style="display:none;">
+      <div class="info-card">
+        <div class="info-label">Chiqarilgan yil</div>
+        <div class="info-value">{{ anime.year }}</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Holat</div>
+        <div class="info-value">{{ anime.status }}</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Fasllar</div>
+        <div class="info-value">{{ anime.seasons|length }}</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Reyting</div>
+        <div class="info-value">⭐ {{ anime.score }}/10</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

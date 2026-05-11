@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ATNALTIK DUBBING — O'zbek tilida anime{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="/">ATNALTIK <b>DUBBING</b></a>
+    <ul class="nav-links">
+      <li><a href="/" id="nav-home">Bosh sahifa</a></li>
+      <li><a href="/#animes">Animelar</a></li>
+      <li><a href="/#genres">Janrlar</a></li>
+    </ul>
+    <div class="nav-search">
+      <span class="nav-search-icon">🔍</span>
+      <input type="text" placeholder="Anime qidirish..." oninput="handleSearch(this.value)" id="navSearch">
+    </div>
+    <div class="nav-right">
+      <button class="btn btn-ghost" onclick="openModal('auth')" id="authBtn">Kirish</button>
+      <button class="btn btn-tg" onclick="window.open('https://t.me/ATNALTIK','_blank')">✈ Telegram</button>
+    </div>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">ATNALTIK <b>DUBBING</b></div>
+      <p class="footer-desc">O'zbek tilidagi eng sifatli anime dubbinglari. Har kuni yangi qismlar va yuqori sifatli ovoz.</p>
+      <div class="footer-socials">
+        <button class="social-btn" onclick="window.open('https://t.me/ATNALTIK','_blank')">Telegram</button>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Platforma</h4>
+      <ul class="footer-links">
+        <li><a href="/">Bosh sahifa</a></li>
+        <li><a href="/#animes">Animelar</a></li>
+        <li><a href="/#genres">Janrlar</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Yordam</h4>
+      <ul class="footer-links">
+        <li><a href="https://t.me/ATNALTIK" target="_blank">Aloqa</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">&copy; 2025 Atnaltik Dubbing. Barcha huquqlar himoyalangan. <br>Design by <a href="#">Antigravity</a></div>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modal-auth" onclick="closeModalIfOutside(event,'auth')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('auth')">✕</button>
+    <div class="modal-title">ATNALTIK DUBBING</div>
+    <div class="modal-tabs">
+      <button class="modal-tab on" onclick="switchAuthTab(this,'login')">Kirish</button>
+      <button class="modal-tab" onclick="switchAuthTab(this,'register')">Ro'yxatdan o'tish</button>
+    </div>
+    <div id="auth-login">
+      <button class="tg-login-btn" onclick="loginWithTelegram()">✈ Telegram orqali kirish</button>
+      <div class="form-divider">yoki</div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Parol</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="Parolingizni kiriting">
+      </div>
+      <div class="form-error" id="loginError"></div>
+      <button class="btn-submit" onclick="doLogin()">Kirish</button>
+    </div>
+    <div id="auth-register" style="display:none">
+      <button class="tg-login-btn" onclick="loginWithTelegram()">✈ Telegram orqali ro'yxatdan o'tish</button>
+      <div class="form-divider">yoki</div>
+      <div class="form-group">
+        <label class="form-label">Ism</label>
+        <input class="form-input" type="text" id="regName" placeholder="Ismingiz">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="regEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Parol</label>
+        <input class="form-input" type="password" id="regPassword" placeholder="Parol yarating">
+      </div>
+      <div class="form-error" id="regError"></div>
+      <button class="btn-submit" onclick="doRegister()">Ro'yxatdan o'tish</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="video-modal-overlay" id="modal-video" onclick="closeVideoIfOutside(event)">
+  <div class="video-container">
+    <button class="video-close" onclick="closeVideoModal()">✕ Yopish</button>
+    <div class="video-frame" id="videoFrame">
+      <div class="video-placeholder">
+        <div class="big-icon">⌛</div>
+        <p>Video yuklanmoqda...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TG_BOT_USERNAME = "{{ tg_bot_username }}";
+</script>
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+<script src="/static/js/main.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

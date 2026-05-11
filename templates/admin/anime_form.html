@@ -1,0 +1,202 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Tahrirlash' if action == 'edit' else 'Yangi anime' }}{% endblock %}
+{% block page_title %}{{ '✏️ Tahrirlash' if action == 'edit' else '➕ Yangi anime' }}{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+<!-- LEFT: Anime info -->
+<div>
+  <div class="page-header" style="margin-bottom:16px">
+    <h2>{{ anime.title if anime else 'Yangi anime' }}</h2>
+    <a href="/admin/animes" class="btn btn-secondary btn-sm">← Orqaga</a>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Asosiy ma'lumotlar</div>
+    <form method="POST" action="{{ '/admin/animes/' + anime.id|string + '/edit' if action == 'edit' else '/admin/animes/add' }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Nomi (O'zbek)</label>
+          <input class="form-input" type="text" name="title" value="{{ anime.title if anime else '' }}" required>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Original nomi (Yapon/Ingliz)</label>
+          <input class="form-input" type="text" name="original_title" value="{{ anime.original_title if anime else '' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon (emoji)</label>
+          <input class="form-input" type="text" name="icon" value="{{ anime.icon if anime else '🎬' }}" style="font-size:20px">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Yil</label>
+          <input class="form-input" type="number" name="year" value="{{ anime.year if anime else 2024 }}" min="1990" max="2030">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reyting (0-10)</label>
+          <input class="form-input" type="number" name="score" value="{{ anime.score if anime else 0 }}" step="0.1" min="0" max="10">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Holat</label>
+          <select class="form-select" name="status">
+            <option value="Davom etmoqda" {{ 'selected' if anime and anime.status == 'Davom etmoqda' else '' }}>Davom etmoqda</option>
+            <option value="Tugallangan" {{ 'selected' if anime and anime.status == 'Tugallangan' else '' }}>Tugallangan</option>
+            <option value="Pauza" {{ 'selected' if anime and anime.status == 'Pauza' else '' }}>Pauza</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Tavsif</label>
+          <textarea class="form-textarea" name="description">{{ anime.description if anime else '' }}</textarea>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Janrlar</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+            {% for g in genres %}
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;padding:5px 10px;background:rgba(255,255,255,.05);border-radius:20px;border:1px solid var(--border)">
+              <input type="checkbox" name="genres" value="{{ g.name }}"
+                {{ 'checked' if anime and g.name in anime.genres else '' }}
+                style="accent-color:var(--accent)">
+              {{ g.icon }} {{ g.name }}
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Cover rasm URL (ixtiyoriy)</label>
+          <input class="form-input" type="text" name="cover_image" value="{{ anime.cover_image if anime else '' }}" placeholder="https://...">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px">
+        {{ '💾 Saqlash' if action == 'edit' else '✅ Qo\'shish' }}
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- RIGHT: Seasons & Episodes -->
+{% if action == 'edit' and anime %}
+<div>
+  <div class="page-header" style="margin-bottom:16px">
+    <h2>Fasllar va qismlar</h2>
+  </div>
+
+  <!-- Add Season -->
+  <details class="card" style="padding:0;overflow:visible">
+    <summary style="padding:14px 16px;cursor:pointer;font-size:13px;font-weight:600;border-radius:8px;list-style:none">➕ Yangi fasl qo'shish</summary>
+    <div style="padding:16px;border-top:1px solid var(--border)">
+      <form method="POST" action="/admin/animes/{{ anime.id }}/seasons/add">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Fasl nomi</label>
+            <input class="form-input" type="text" name="title" placeholder="1-fasl" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Yil</label>
+            <input class="form-input" type="number" name="year" value="2024">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tartib raqami</label>
+            <input class="form-input" type="number" name="order_num" value="{{ (anime.seasons|length) + 1 }}">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Qo'shish</button>
+      </form>
+    </div>
+  </details>
+
+  <!-- Seasons List -->
+  {% for season in anime.seasons %}
+  <div class="season-block" style="margin-bottom:12px">
+    <div class="season-head">
+      <span>📂 {{ season.title }} ({{ season.year }})</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="badge badge-blue">{{ season.episodes|length }} qism</span>
+        <form method="POST" action="/admin/seasons/{{ season.id }}/delete" onsubmit="return confirm('Faslni o\'chirishni tasdiqlaysizmi?')">
+          <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Episodes -->
+    {% for ep in season.episodes %}
+    <div class="ep-row">
+      <div>
+        <b style="color:var(--text2);margin-right:8px">#{{ ep.num }}</b>
+        {{ ep.title }}
+        <span style="color:var(--text3);font-size:11px;margin-left:6px">{{ ep.duration }}</span>
+        {% if ep.is_new %}<span class="badge badge-orange" style="margin-left:6px">YANGI</span>{% endif %}
+        {% if ep.telegram_file_id %}<span class="badge badge-green" style="margin-left:4px">📁 File</span>{% elif ep.telegram_url %}<span class="badge badge-blue" style="margin-left:4px">🔗 URL</span>{% endif %}
+      </div>
+      <div style="display:flex;gap:6px">
+        <form method="POST" action="/admin/episodes/{{ ep.id }}/toggle-new">
+          <button type="submit" class="btn btn-sm" style="background:rgba(255,152,0,.15);color:var(--orange);border:1px solid rgba(255,152,0,.3)">
+            {{ '☆ Yangi emas' if ep.is_new else '⭐ Yangi' }}
+          </button>
+        </form>
+        <form method="POST" action="/admin/episodes/{{ ep.id }}/delete" onsubmit="return confirm('Qismni o\'chirishni tasdiqlaysizmi?')">
+          <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Add Episode -->
+    <details style="border-top:1px solid var(--border)">
+      <summary style="padding:10px 14px;cursor:pointer;font-size:12px;color:var(--text2);background:rgba(255,255,255,.02)">+ Qism qo'shish</summary>
+      <div style="padding:14px;background:rgba(255,255,255,.02)">
+        <form method="POST" action="/admin/seasons/{{ season.id }}/episodes/add">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group">
+              <label class="form-label">Qism raqami</label>
+              <input class="form-input" type="number" name="num" value="{{ (season.episodes|length) + 1 }}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Davomiyligi</label>
+              <input class="form-input" type="text" name="duration" value="24 dq">
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label class="form-label">Qism nomi</label>
+              <input class="form-input" type="text" name="title" required>
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label class="form-label">Telegram URL (kanal linki)</label>
+              <input class="form-input" type="text" name="telegram_url" placeholder="https://t.me/ATNALTIK/123">
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label class="form-label">Telegram File ID (stream uchun)</label>
+              <input class="form-input" type="text" name="telegram_file_id" placeholder="BQACAgIAAxkBAAI...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telegram Chat ID</label>
+              <input class="form-input" type="text" name="telegram_chat_id" placeholder="-100...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telegram Message ID</label>
+              <input class="form-input" type="number" name="telegram_msg_id" placeholder="123">
+            </div>
+            <div style="grid-column:1/-1; font-size:11px;color:var(--text3);margin-top:0px;margin-bottom:10px">
+              💡 <b>Chat ID</b> va <b>Message ID</b> bo'lsa, Telethon stream 100% ishonchli ishlaydi.
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+                <input type="checkbox" name="is_new" style="accent-color:var(--accent)">
+                Yangi qism (YANGI belgisi)
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">Qo'shish</button>
+        </form>
+      </div>
+    </details>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+</div>
+
+{% if action != 'edit' %}
+<div style="max-width:600px">
+  <a href="/admin/animes" class="btn btn-secondary">← Orqaga</a>
+</div>
+{% endif %}
+{% endblock %}
