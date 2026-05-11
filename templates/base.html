@@ -3,7 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ATNALTIK DUBBING — O'zbek tilida anime{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>{% block title %}Atnaltik Dubbing — O'zbek tilida animelar portali{% endblock %}</title>
+    <meta name="description" content="Atnaltik Dubbing - eng so'nggi o'zbekcha animelar, atnaltik sayti, atnaltik dubbing jamoasi tomonidan o'zbek tiliga o'girilgan sara animelar to'plami.">
+    <meta name="keywords" content="atnaltik, atnaltik dubbing, o'zbekcha animelar, atnaltik sayti, anime o'zbek tilida, uzbek anime, atnaltik.one">
+    <meta name="author" content="Atnaltik Dubbing">
+    
+    <!-- Open Graph (Ijtimoiy tarmoqlar uchun) -->
+    <meta property="og:title" content="Atnaltik Dubbing — O'zbek tilida animelar">
+    <meta property="og:description" content="Eng sara animelar o'zbek tilida faqat Atnaltik saytida!">
+    <meta property="og:url" content="https://atnaltik.one">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ url_for('static', filename='img/logo.png') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css">

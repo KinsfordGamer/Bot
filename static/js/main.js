@@ -152,13 +152,24 @@ async function playEpisode(episodeId, telegramUrl) {
   video.onerror = async (e) => {
     console.error("Video error:", video.error);
     
+    // Serverdan kelgan xabarni tekshirish (JSON bo'lishi mumkin)
+    let serverError = null;
+    try {
+        const checkRes = await fetch(`/api/stream/${episodeId}`, { method: 'HEAD' });
+        if (!checkRes.ok) {
+            // Agar xato bo'lsa, batafsil ma'lumot olish uchun GET so'rov qilamiz
+            const getRes = await fetch(`/api/stream/${episodeId}`);
+            const errData = await getRes.json();
+            serverError = errData.error;
+        }
+    } catch(err) {}
+
     frame.innerHTML = `
       <div class="video-placeholder">
-        <div style="font-size:3rem;margin-bottom:16px">📱</div>
-        <h3 style="margin-bottom:8px">Mobil moslik muammosi</h3>
+        <div style="font-size:3rem;margin-bottom:16px">${serverError ? '⚠️' : '🎬'}</div>
+        <h3 style="margin-bottom:8px">${serverError ? 'Server xatosi' : 'Format qo\'llab-quvvatlanmaydi'}</h3>
         <p style="margin-bottom:20px;color:var(--text2);padding:0 20px;font-size:14px">
-          Ushbu video formati telefoningiz brauzerida ochilmadi.<br>
-          Telegram orqali ko'ring yoki videoni yuklab oling.
+          ${serverError || 'Ushbu video formati (MKV/HEVC) yoki brauzer cheklovi sababli video ochilmadi. Telegram orqali ko\'ring yoki videoni yuklab oling.'}
         </p>
         <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:280px">
           <button class="btn btn-primary" onclick="window.open('${telegramUrl || 'https://t.me/ATNALTIK'}','_blank')">
